@@ -97,6 +97,10 @@ local function get_target(name)
 	return target
 end
 
+-- local function is_registered_target(name)
+-- 	return registry.targets[name] ~= nil
+-- end
+
 local function add_unique(list, value)
 	for _, existing in ipairs(list) do
 		if existing == value then
@@ -136,13 +140,13 @@ end
 local function collect_usage(target_name, result, visiting)
 	local target = registry.targets[target_name]
 
-	if not target then
-		error("unknown dependency target '" .. tostring(target_name) ..
-		"'. Make sure the dependency project is included before it is used.",
-		3)
-	end
+	-- if not target then
+	-- 	error("unknown dependency target '" .. tostring(target_name) ..
+	-- 		"'. Make sure the dependency project is included before it is used.",
+	-- 		3)
+	-- end
 
-	if visiting[target_name] then
+	if not target or visiting[target_name] then
 		return
 	end
 
@@ -262,5 +266,9 @@ link_libraries = M.link_libraries
 PRIVATE = SCOPES.PRIVATE
 PUBLIC = SCOPES.PUBLIC
 INTERFACE = SCOPES.INTERFACE
+
+-- Dependency projects must be included before they are linked if their usage
+-- requirements should be propagated. Unknown libraries are treated as external
+-- linker inputs and do not provide usage requirements.
 
 return M

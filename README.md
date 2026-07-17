@@ -2,7 +2,8 @@
 
 A lightweight C++ project template based on Premake.
 
-This repository provides a minimal starting point for C++ projects using Visual Studio/MSVC on Windows. It includes a ready-to-use Premake setup with separate application and core library projects, Debug/Release configurations, and organized output directories.
+This repository provides a minimal starting point for C++ projects using Visual Studio/MSVC on Windows.  
+It includes a ready-to-use Premake setup with separate application and core library projects, Debug/Release configurations, and organized output directories.
 
 ## Projects
 
@@ -27,6 +28,12 @@ The output directories are organized by configuration, system, architecture, and
 .bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}
 .bin-int/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}
 ```
+
+## Premake Helpers
+
+This template provides `include_directories(scope, ...)` and `link_libraries(scope, ...)` helpers with `PRIVATE`, `PUBLIC`, and `INTERFACE` scopes.
+
+When using `link_libraries`, project dependencies should be included before use so their public include directories can be propagated. Unknown library names are treated as external linker inputs.
 
 ## Generate Visual Studio Files
 
