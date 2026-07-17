@@ -1,9 +1,12 @@
-workspace "@WORKSPACE@"
+require "vendor.premake.customization.dependencies"
+require "vendor.premake.customization.clean"
+
+workspace "WORKSPACE"
 	architecture "x64"
 	staticruntime "On"
 	systemversion "latest"
 
-	startproject "@STARTPROJECT@"
+	startproject "APP"
 
 	configurations
 	{
@@ -26,31 +29,5 @@ filter "configurations:Release"
 
 filter {}
 
-include "@Core@"
-include "@App@"
-		
-newaction
-{
-	trigger = "clean",
-	description = "Clean intermediates.",
-	onStart = function()
-		print("Starting cleaning...")
-	end,
-	execute = function()
-		local cacheDir = ".vs"
-		local sln = "*.sln"
-		local prj = "**.vcxproj*"
-
-		os.rmdir(cacheDir)
-		print("Cleaned", cacheDir)
-
-		os.remove(sln)
-		print("Cleaned", sln)
-
-		os.remove(prj)
-		print("Cleaned", prj)
-	end,
-	onEnd = function()
-		print("Done.")
-	end
-}
+include "CORE"
+include "APP"

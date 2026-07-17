@@ -1,12 +1,8 @@
-project "@Core@"
+project "CORE"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++20"
 
 	files { "src/**.hpp", "src/**.cpp" }
 
-usage "PUBLIC"
-	includedirs { "src" }
-
-usage "INTERFACE"
-	links "@Core@"
+	include_directories(PUBLIC, "src")
