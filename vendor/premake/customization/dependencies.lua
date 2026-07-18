@@ -99,7 +99,11 @@ local function get_target(name)
 
 		private_uses = {},
 		public_uses = {},
-		interface_uses = {}
+		interface_uses = {},
+
+		private_defines = {},
+		public_defines = {},
+		interface_defines = {}
 	}
 
 	registry.targets[name] = target
@@ -195,6 +199,14 @@ local function collect_usage(target_name, result, visiting)
 		collect_usage(library, result, visiting)
 	end
 
+	for _, definition in ipairs(target.public_defines) do
+		add_unique(result.defines, definition)
+	end
+
+	for _, definition in ipairs(target.interface_defines) do
+		add_unique(result.defines, definition)
+	end
+
 	visiting[target_name] = nil
 end
 
@@ -202,7 +214,8 @@ local function apply_usage(libraries, caller_dir)
 	local usage = {
 		includes = {},
 		links = {},
-		linkdirs = {}
+		linkdirs = {},
+		defines = {}
 	}
 
 	for _, library in ipairs(libraries) do
@@ -219,6 +232,10 @@ local function apply_usage(libraries, caller_dir)
 
 	if #usage.linkdirs > 0 then
 		libdirs(to_relative_paths(usage.linkdirs, caller_dir))
+	end
+
+	if #usage.defines > 0 then
+		defines(usage.defines)
 	end
 end
 
@@ -370,6 +387,40 @@ function M.use_libraries(scope, ...)
 	end
 end
 
+function M.compile_definitions(scope, ...)
+	assert_valid_scope(scope)
+
+	local project_name = get_current_project_name()
+	local target = get_target(project_name)
+
+	local definitions = flatten_values(...)
+
+	if scope == SCOPES.PRIVATE then
+		for _, definition in ipairs(definitions) do
+			add_unique(target.private_defines, definition)
+		end
+
+		defines(definitions)
+		return
+	end
+
+	if scope == SCOPES.PUBLIC then
+		for _, definition in ipairs(definitions) do
+			add_unique(target.public_defines, definition)
+		end
+
+		defines(definitions)
+		return
+	end
+
+	if scope == SCOPES.INTERFACE then
+		for _, definition in ipairs(definitions) do
+			add_unique(target.interface_defines, definition)
+		end
+		return
+	end
+end
+
 M._registry = registry
 M._scopes = SCOPES
 
@@ -377,6 +428,7 @@ include_directories = M.include_directories
 link_libraries = M.link_libraries
 link_directories = M.link_directories
 use_libraries = M.use_libraries
+compile_definitions = M.compile_definitions
 
 PRIVATE = SCOPES.PRIVATE
 PUBLIC = SCOPES.PUBLIC
