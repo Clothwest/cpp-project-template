@@ -95,7 +95,11 @@ local function get_target(name)
 
 		private_linkdirs = {},
 		public_linkdirs = {},
-		interface_linkdirs = {}
+		interface_linkdirs = {},
+
+		private_uses = {},
+		public_uses = {},
+		interface_uses = {}
 	}
 
 	registry.targets[name] = target
@@ -183,6 +187,14 @@ local function collect_usage(target_name, result, visiting)
 		add_unique(result.linkdirs, linkdir)
 	end
 
+	for _, library in ipairs(target.public_uses) do
+		collect_usage(library, result, visiting)
+	end
+
+	for _, library in ipairs(target.interface_uses) do
+		collect_usage(library, result, visiting)
+	end
+
 	visiting[target_name] = nil
 end
 
@@ -243,6 +255,7 @@ function M.include_directories(scope, ...)
 		for _, include_dir in ipairs(absolute_paths) do
 			add_unique(target.interface_includes, include_dir)
 		end
+		return
 	end
 end
 
@@ -280,6 +293,7 @@ function M.link_libraries(scope, ...)
 		for _, library in ipairs(libraries) do
 			add_unique(target.interface_links, library)
 		end
+		return
 	end
 end
 
@@ -300,6 +314,7 @@ function M.link_directories(scope, ...)
 		end
 
 		libdirs(directories)
+		return
 	end
 
 	if scope == SCOPES.PUBLIC then
@@ -308,12 +323,50 @@ function M.link_directories(scope, ...)
 		end
 
 		libdirs(directories)
+		return
 	end
 
 	if scope == SCOPES.INTERFACE then
 		for _, directory in ipairs(absolute_paths) do
 			add_unique(target.interface_linkdirs, directory)
 		end
+		return
+	end
+end
+
+function M.use_libraries(scope, ...)
+	assert_valid_scope(scope)
+
+	local project_name = get_current_project_name()
+	local target = get_target(project_name)
+
+	local call_dir = get_calling_script_dir()
+
+	local libraries = flatten_values(...)
+
+	if scope == SCOPES.PRIVATE then
+		for _, library in ipairs(libraries) do
+			add_unique(target.private_uses, library)
+		end
+
+		apply_usage(libraries, call_dir)
+		return
+	end
+
+	if scope == SCOPES.PUBLIC then
+		for _, library in ipairs(libraries) do
+			add_unique(target.public_uses, library)
+		end
+
+		apply_usage(libraries, call_dir)
+		return
+	end
+
+	if scope == SCOPES.INTERFACE then
+		for _, library in ipairs(libraries) do
+			add_unique(target.interface_uses, library)
+		end
+		return
 	end
 end
 
@@ -323,6 +376,7 @@ M._scopes = SCOPES
 include_directories = M.include_directories
 link_libraries = M.link_libraries
 link_directories = M.link_directories
+use_libraries = M.use_libraries
 
 PRIVATE = SCOPES.PRIVATE
 PUBLIC = SCOPES.PUBLIC
