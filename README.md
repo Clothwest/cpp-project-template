@@ -31,7 +31,7 @@ The output directories are organized by configuration, system, architecture, and
 
 ## Premake Helpers
 
-This template provides `include_directories(scope, ...)` and `link_libraries(scope, ...)` helpers with `PRIVATE`, `PUBLIC`, and `INTERFACE` scopes.
+This template provides `include_directories(scope, ...)`, `link_directories(scope, ...)`, and `link_libraries(scope, ...)` helpers with `PRIVATE`, `PUBLIC`, and `INTERFACE` scopes.
 
 When using `link_libraries`, project dependencies should be included before use so their public include directories can be propagated. Unknown library names are treated as external linker inputs.
 

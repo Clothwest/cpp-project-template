@@ -88,9 +88,14 @@ local function get_target(name)
 		private_includes = {},
 		public_includes = {},
 		interface_includes = {},
+
 		private_links = {},
 		public_links = {},
-		interface_links = {}
+		interface_links = {},
+
+		private_linkdirs = {},
+		public_linkdirs = {},
+		interface_linkdirs = {}
 	}
 
 	registry.targets[name] = target
@@ -170,13 +175,22 @@ local function collect_usage(target_name, result, visiting)
 		collect_usage(library, result, visiting)
 	end
 
+	for _, linkdir in ipairs(target.public_linkdirs) do
+		add_unique(result.linkdirs, linkdir)
+	end
+
+	for _, linkdir in ipairs(target.interface_linkdirs) do
+		add_unique(result.linkdirs, linkdir)
+	end
+
 	visiting[target_name] = nil
 end
 
 local function apply_usage(libraries, caller_dir)
 	local usage = {
 		includes = {},
-		links = {}
+		links = {},
+		linkdirs = {}
 	}
 
 	for _, library in ipairs(libraries) do
@@ -190,15 +204,21 @@ local function apply_usage(libraries, caller_dir)
 	if #usage.links > 0 then
 		links(usage.links)
 	end
+
+	if #usage.linkdirs > 0 then
+		libdirs(to_relative_paths(usage.linkdirs, caller_dir))
+	end
 end
 
 function M.include_directories(scope, ...)
 	assert_valid_scope(scope)
 
 	local project_name = get_current_project_name()
-	local caller_dir = get_calling_script_dir()
-	local values = flatten_values(...)
 	local target = get_target(project_name)
+
+	local caller_dir = get_calling_script_dir()
+
+	local values = flatten_values(...)
 	local absolute_paths = to_absolute_paths(values, caller_dir)
 
 	if scope == SCOPES.PRIVATE then
@@ -219,8 +239,10 @@ function M.include_directories(scope, ...)
 		return
 	end
 
-	for _, include_dir in ipairs(absolute_paths) do
-		add_unique(target.interface_includes, include_dir)
+	if scope == SCOPES.INTERFACE then
+		for _, include_dir in ipairs(absolute_paths) do
+			add_unique(target.interface_includes, include_dir)
+		end
 	end
 end
 
@@ -228,9 +250,11 @@ function M.link_libraries(scope, ...)
 	assert_valid_scope(scope)
 
 	local project_name = get_current_project_name()
-	local caller_dir = get_calling_script_dir()
-	local libraries = flatten_values(...)
 	local target = get_target(project_name)
+
+	local caller_dir = get_calling_script_dir()
+
+	local libraries = flatten_values(...)
 
 	if scope == SCOPES.PRIVATE then
 		for _, library in ipairs(libraries) do
@@ -252,8 +276,44 @@ function M.link_libraries(scope, ...)
 		return
 	end
 
-	for _, library in ipairs(libraries) do
-		add_unique(target.interface_links, library)
+	if scope == SCOPES.INTERFACE then
+		for _, library in ipairs(libraries) do
+			add_unique(target.interface_links, library)
+		end
+	end
+end
+
+function M.link_directories(scope, ...)
+	assert_valid_scope(scope)
+
+	local project_name = get_current_project_name()
+	local target = get_target(project_name)
+
+	local caller_dir = get_calling_script_dir()
+
+	local directories = flatten_values(...)
+	local absolute_paths = to_absolute_paths(directories, caller_dir)
+
+	if scope == SCOPES.PRIVATE then
+		for _, directory in ipairs(absolute_paths) do
+			add_unique(target.private_linkdirs, directory)
+		end
+
+		libdirs(directories)
+	end
+
+	if scope == SCOPES.PUBLIC then
+		for _, directory in ipairs(absolute_paths) do
+			add_unique(target.public_linkdirs, directory)
+		end
+
+		libdirs(directories)
+	end
+
+	if scope == SCOPES.INTERFACE then
+		for _, directory in ipairs(absolute_paths) do
+			add_unique(target.interface_linkdirs, directory)
+		end
 	end
 end
 
@@ -262,6 +322,7 @@ M._scopes = SCOPES
 
 include_directories = M.include_directories
 link_libraries = M.link_libraries
+link_directories = M.link_directories
 
 PRIVATE = SCOPES.PRIVATE
 PUBLIC = SCOPES.PUBLIC
