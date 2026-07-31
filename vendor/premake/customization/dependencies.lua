@@ -1,6 +1,6 @@
-local M = {}
+CPT = {}
 
-local SCOPES = {
+local scopes = {
 	PRIVATE = "PRIVATE",
 	PUBLIC = "PUBLIC",
 	INTERFACE = "INTERFACE"
@@ -37,7 +37,7 @@ local function flatten_values(...)
 end
 
 local function assert_valid_scope(scope)
-	if type(scope) ~= "string" or not SCOPES[scope] then
+	if type(scope) ~= "string" or not scopes[scope] then
 		error("invalid scope '" .. tostring(scope) .. "'", 3)
 	end
 end
@@ -239,7 +239,7 @@ local function apply_usage(libraries, caller_dir)
 	end
 end
 
-function M.include_directories(scope, ...)
+function CPT.include_directories(scope, ...)
 	assert_valid_scope(scope)
 
 	local project_name = get_current_project_name()
@@ -250,7 +250,7 @@ function M.include_directories(scope, ...)
 	local values = flatten_values(...)
 	local absolute_paths = to_absolute_paths(values, caller_dir)
 
-	if scope == SCOPES.PRIVATE then
+	if scope == scopes.PRIVATE then
 		for _, include_dir in ipairs(absolute_paths) do
 			add_unique(target.private_includes, include_dir)
 		end
@@ -259,7 +259,7 @@ function M.include_directories(scope, ...)
 		return
 	end
 
-	if scope == SCOPES.PUBLIC then
+	if scope == scopes.PUBLIC then
 		for _, include_dir in ipairs(absolute_paths) do
 			add_unique(target.public_includes, include_dir)
 		end
@@ -268,7 +268,7 @@ function M.include_directories(scope, ...)
 		return
 	end
 
-	if scope == SCOPES.INTERFACE then
+	if scope == scopes.INTERFACE then
 		for _, include_dir in ipairs(absolute_paths) do
 			add_unique(target.interface_includes, include_dir)
 		end
@@ -276,7 +276,7 @@ function M.include_directories(scope, ...)
 	end
 end
 
-function M.link_libraries(scope, ...)
+function CPT.link_libraries(scope, ...)
 	assert_valid_scope(scope)
 
 	local project_name = get_current_project_name()
@@ -286,7 +286,7 @@ function M.link_libraries(scope, ...)
 
 	local libraries = flatten_values(...)
 
-	if scope == SCOPES.PRIVATE then
+	if scope == scopes.PRIVATE then
 		for _, library in ipairs(libraries) do
 			add_unique(target.private_links, library)
 		end
@@ -296,7 +296,7 @@ function M.link_libraries(scope, ...)
 		return
 	end
 
-	if scope == SCOPES.PUBLIC then
+	if scope == scopes.PUBLIC then
 		for _, library in ipairs(libraries) do
 			add_unique(target.public_links, library)
 		end
@@ -306,7 +306,7 @@ function M.link_libraries(scope, ...)
 		return
 	end
 
-	if scope == SCOPES.INTERFACE then
+	if scope == scopes.INTERFACE then
 		for _, library in ipairs(libraries) do
 			add_unique(target.interface_links, library)
 		end
@@ -314,7 +314,7 @@ function M.link_libraries(scope, ...)
 	end
 end
 
-function M.link_directories(scope, ...)
+function CPT.link_directories(scope, ...)
 	assert_valid_scope(scope)
 
 	local project_name = get_current_project_name()
@@ -325,7 +325,7 @@ function M.link_directories(scope, ...)
 	local directories = flatten_values(...)
 	local absolute_paths = to_absolute_paths(directories, caller_dir)
 
-	if scope == SCOPES.PRIVATE then
+	if scope == scopes.PRIVATE then
 		for _, directory in ipairs(absolute_paths) do
 			add_unique(target.private_linkdirs, directory)
 		end
@@ -334,7 +334,7 @@ function M.link_directories(scope, ...)
 		return
 	end
 
-	if scope == SCOPES.PUBLIC then
+	if scope == scopes.PUBLIC then
 		for _, directory in ipairs(absolute_paths) do
 			add_unique(target.public_linkdirs, directory)
 		end
@@ -343,7 +343,7 @@ function M.link_directories(scope, ...)
 		return
 	end
 
-	if scope == SCOPES.INTERFACE then
+	if scope == scopes.INTERFACE then
 		for _, directory in ipairs(absolute_paths) do
 			add_unique(target.interface_linkdirs, directory)
 		end
@@ -351,7 +351,7 @@ function M.link_directories(scope, ...)
 	end
 end
 
-function M.use_libraries(scope, ...)
+function CPT.use_libraries(scope, ...)
 	assert_valid_scope(scope)
 
 	local project_name = get_current_project_name()
@@ -361,7 +361,7 @@ function M.use_libraries(scope, ...)
 
 	local libraries = flatten_values(...)
 
-	if scope == SCOPES.PRIVATE then
+	if scope == scopes.PRIVATE then
 		for _, library in ipairs(libraries) do
 			add_unique(target.private_uses, library)
 		end
@@ -370,7 +370,7 @@ function M.use_libraries(scope, ...)
 		return
 	end
 
-	if scope == SCOPES.PUBLIC then
+	if scope == scopes.PUBLIC then
 		for _, library in ipairs(libraries) do
 			add_unique(target.public_uses, library)
 		end
@@ -379,7 +379,7 @@ function M.use_libraries(scope, ...)
 		return
 	end
 
-	if scope == SCOPES.INTERFACE then
+	if scope == scopes.INTERFACE then
 		for _, library in ipairs(libraries) do
 			add_unique(target.interface_uses, library)
 		end
@@ -387,7 +387,7 @@ function M.use_libraries(scope, ...)
 	end
 end
 
-function M.compile_definitions(scope, ...)
+function CPT.compile_definitions(scope, ...)
 	assert_valid_scope(scope)
 
 	local project_name = get_current_project_name()
@@ -395,7 +395,7 @@ function M.compile_definitions(scope, ...)
 
 	local definitions = flatten_values(...)
 
-	if scope == SCOPES.PRIVATE then
+	if scope == scopes.PRIVATE then
 		for _, definition in ipairs(definitions) do
 			add_unique(target.private_defines, definition)
 		end
@@ -404,7 +404,7 @@ function M.compile_definitions(scope, ...)
 		return
 	end
 
-	if scope == SCOPES.PUBLIC then
+	if scope == scopes.PUBLIC then
 		for _, definition in ipairs(definitions) do
 			add_unique(target.public_defines, definition)
 		end
@@ -413,7 +413,7 @@ function M.compile_definitions(scope, ...)
 		return
 	end
 
-	if scope == SCOPES.INTERFACE then
+	if scope == scopes.INTERFACE then
 		for _, definition in ipairs(definitions) do
 			add_unique(target.interface_defines, definition)
 		end
@@ -421,21 +421,22 @@ function M.compile_definitions(scope, ...)
 	end
 end
 
-M._registry = registry
-M._scopes = SCOPES
+CPT.PRIVATE = scopes.PRIVATE
+CPT.PUBLIC = scopes.PUBLIC
+CPT.INTERFACE = scopes.INTERFACE
 
-include_directories = M.include_directories
-link_libraries = M.link_libraries
-link_directories = M.link_directories
-use_libraries = M.use_libraries
-compile_definitions = M.compile_definitions
+include_directories = CPT.include_directories
+link_libraries = CPT.link_libraries
+link_directories = CPT.link_directories
+use_libraries = CPT.use_libraries
+compile_definitions = CPT.compile_definitions
 
-PRIVATE = SCOPES.PRIVATE
-PUBLIC = SCOPES.PUBLIC
-INTERFACE = SCOPES.INTERFACE
+PRIVATE = CPT.PRIVATE
+PUBLIC = CPT.PUBLIC
+INTERFACE = CPT.INTERFACE
 
 -- Dependency projects must be included before they are linked if their usage
 -- requirements should be propagated. Unknown libraries are treated as external
 -- linker inputs and do not provide usage requirements.
 
-return M
+return CPT
