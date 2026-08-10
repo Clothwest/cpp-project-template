@@ -6,6 +6,20 @@ This repository provides a minimal starting point for C++ projects using Visual 
 
 It includes a ready-to-use Premake setup with separate application and core library projects, Debug/Release configurations, and organized output directories.
 
+## Clone the Repository
+
+Clone the repository together with its Premake extensions:
+
+```powershell
+git clone --recurse-submodules <repository-url>
+```
+
+If the repository has already been cloned, initialize the submodule separately:
+
+```powershell
+git submodule update --init --recursive
+```
+
 ## Projects
 
 ### App
@@ -32,7 +46,7 @@ The output directories are organized by configuration, system, architecture, and
 
 ## Premake Helpers
 
-This template provides `include_directories(scope, ...)`, `link_directories(scope, ...)`, `link_libraries(scope, ...)`, `use_libraries(scope, ...)`, and `compile_definitions(scope, ...)` helpers with `PRIVATE`, `PUBLIC`, and `INTERFACE` scopes.
+This template uses [CPT Premake Extensions](https://github.com/Clothwest/cpt-premake-extensions) to provide `include_directories(scope, ...)`, `link_directories(scope, ...)`, `link_libraries(scope, ...)`, `use_libraries(scope, ...)`, and `compile_definitions(scope, ...)` helpers with `PRIVATE`, `PUBLIC`, and `INTERFACE` scopes.
 
 Each helper and scope is also available through the `CPT` namespace, such as `CPT.include_directories(CPT.PUBLIC, ...)`, for use when a global name conflicts with another script.
 

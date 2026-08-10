@@ -1,0 +1,4 @@
+[submodule "vendor/premake/customization"]
+	path = vendor/premake/customization
+	url = https://github.com/Clothwest/cpt-premake-extensions.git
+	branch = main
