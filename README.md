@@ -34,6 +34,8 @@ The output directories are organized by configuration, system, architecture, and
 
 This template provides `include_directories(scope, ...)`, `link_directories(scope, ...)`, `link_libraries(scope, ...)`, `use_libraries(scope, ...)`, and `compile_definitions(scope, ...)` helpers with `PRIVATE`, `PUBLIC`, and `INTERFACE` scopes.
 
+Each helper and scope is also available through the `CPT` namespace, such as `CPT.include_directories(CPT.PUBLIC, ...)`, for use when a global name conflicts with another script.
+
 When using `link_libraries`, project dependencies should be included before use so their public include directories can be propagated. Unknown library names are treated as external linker inputs.
 
 Use `use_libraries` for header-only or interface-style dependencies that should propagate usage requirements without adding a linker input.

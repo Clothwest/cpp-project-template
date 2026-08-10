@@ -6,6 +6,6 @@ namespace Core
 {
 	void Print()
 	{
-		std::cout << "Helllo, cpp-project-template!" << std::endl;
+		std::cout << "Hello, cpp-project-template!" << std::endl;
 	}
 }

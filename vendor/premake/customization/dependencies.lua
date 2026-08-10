@@ -54,7 +54,7 @@ local function get_current_project_name()
 	end
 
 	if not current or not current.name then
-		error("include_directories() and link_libraries() must be called inside a project", 3)
+		error("must be called inside a project", 3)
 	end
 
 	return current.name
